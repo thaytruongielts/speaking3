@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài Giảng Word Form IELTS Speaking</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .draggable {
+            cursor: grab;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            user-select: none;
+            touch-action: none;
+        }
+        .draggable:active {
+            cursor: grabbing;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            transform: scale(1.1) rotate(5deg);
+        }
+        .drop-zone {
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            border-style: dashed;
+            min-height: 40px;
+        }
+        .drop-zone.drag-over {
+            background-color: #e2e8f0;
+            transform: scale(1.05);
+        }
+        .correct {
+            background-color: #d1fae5;
+            animation: bounce 0.5s ease;
+        }
+        .incorrect {
+            background-color: #fee2e2;
+            animation: shake 0.5s ease;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen py-10">
+
+    <div class="bg-white rounded-3xl shadow-xl p-8 max-w-4xl mx-auto w-full">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-indigo-700">Luyện Từ Vựng IELTS Speaking Part 2</h1>
+            <p class="text-lg text-gray-600 mt-2">Nâng cao band điểm của bạn với 50 câu Word Form chuyên sâu!</p>
+        </div>
+
+        <div id="exercise-container" class="space-y-8">
+            <!-- Bài tập sẽ được tạo bởi JavaScript -->
+        </div>
+
+        <div class="mt-8 text-center flex flex-col items-center space-y-4">
+            <div class="flex space-x-4">
+                <button id="check-button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition transform hover:scale-105">
+                    Kiểm Tra
+                </button>
+                <button id="next-button" class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-3 px-8 rounded-full shadow-lg transition transform hover:scale-105">
+                    Câu Tiếp
+                </button>
+            </div>
+            <div id="feedback-message" class="mt-4 text-xl font-semibold"></div>
+        </div>
+    </div>
+
+    <script>
+        // Data for 50 IELTS Speaking Part 2 Word Form exercises
+        const exercises = [
+            { sentence: "One of the most valuable lessons I've learned is the ... of persistence.", blanks: ["importance"], options: ["important", "importantly", "importance"], correct: "importance", explanation: "After 'the', a noun is required to complete the phrase. 'Importance' is the noun form of 'important'." },
+            { sentence: "The city's rapid ... has led to many challenges.", blanks: ["development"], options: ["develop", "developing", "development"], correct: "development", explanation: "The subject of the sentence is the noun 'development'. It refers to the process of growing." },
+            { sentence: "I chose to study abroad because of the ... opportunities it offered.", blanks: ["academic"], options: ["academy", "academically", "academic"], correct: "academic", explanation: "An adjective is needed before the noun 'opportunities' to describe them. 'Academic' is the correct form." },
+            { sentence: "He spoke with great ... about his passion for music.", blanks: ["enthusiasm"], options: ["enthuse", "enthusiastic", "enthusiasm"], correct: "enthusiasm", explanation: "After 'great', a noun is needed to complete the phrase. 'Enthusiasm' is the noun form of 'enthusiastic'." },
+            { sentence: "The building's unique ... makes it stand out.", blanks: ["design"], options: ["design", "designer", "designing"], correct: "design", explanation: "The subject of the sentence requires a noun. 'Design' is the noun form of 'design'." },
+            { sentence: "My favorite childhood memory is the ... I felt on my birthday.", blanks: ["excitement"], options: ["excite", "excited", "excitement"], correct: "excitement", explanation: "After 'the', a noun is needed. 'Excitement' is the noun form of 'excite'." },
+            { sentence: "The team's ... was crucial to winning the competition.", blanks: ["cooperation"], options: ["cooperate", "cooperative", "cooperation"], correct: "cooperation", explanation: "The subject of the sentence is the noun 'cooperation'." },
+            { sentence: "A good leader needs to demonstrate ... and integrity.", blanks: ["confidence"], options: ["confident", "confidently", "confidence"], correct: "confidence", explanation: "The phrase 'and integrity' indicates that a noun is required. 'Confidence' is the noun form of 'confident'." },
+            { sentence: "I was deeply impressed by her ... to the project.", blanks: ["dedication"], options: ["dedicate", "dedicated", "dedication"], correct: "dedication", explanation: "The noun 'dedication' is required after 'by her' to refer to the quality she possesses." },
+            { sentence: "The film's ... ending left everyone speechless.", blanks: ["surprising"], options: ["surprise", "surprised", "surprising"], correct: "surprising", explanation: "An adjective is needed to describe the noun 'ending'. 'Surprising' describes something that causes surprise." },
+            { sentence: "Learning a new language is a ... experience.", blanks: ["challenging"], options: ["challenge", "challenged", "challenging"], correct: "challenging", explanation: "An adjective is needed to describe the noun 'experience'. 'Challenging' describes something that is difficult but rewarding." },
+            { sentence: "His ... of the city's history was impressive.", blanks: ["knowledge"], options: ["know", "knowledgeable", "knowledge"], correct: "knowledge", explanation: "A noun is required to be the object of the preposition 'of'. 'Knowledge' is the noun form of 'know'." },
+            { sentence: "The company's ... has grown rapidly over the past year.", blanks: ["success"], options: ["succeed", "successful", "success"], correct: "success", explanation: "The subject of the sentence is the noun 'success'. It refers to a positive outcome." },
+            { sentence: "The doctor explained the treatment ... and clearly.", blanks: ["carefully"], options: ["careful", "carefulness", "carefully"], correct: "carefully", explanation: "An adverb is needed to modify the verb 'explained'. 'Carefully' describes how he explained it." },
+            { sentence: "Living in a foreign country requires a great deal of ...", blanks: ["adaptability"], options: ["adapt", "adaptable", "adaptability"], correct: "adaptability", explanation: "A noun is needed after 'deal of'. 'Adaptability' is the noun form of 'adaptable'." },
+            { sentence: "The ... of technology has changed our lives completely.", blanks: ["evolution"], options: ["evolve", "evolutionary", "evolution"], correct: "evolution", explanation: "The subject of the sentence is the noun 'evolution'. It refers to a gradual process of change." },
+            { sentence: "I have a lot of ... for my parents' hard work.", blanks: ["admiration"], options: ["admire", "admirable", "admiration"], correct: "admiration", explanation: "A noun is needed after 'a lot of'. 'Admiration' is the noun form of 'admire'." },
+            { sentence: "The film was very ... and thought-provoking.", blanks: ["effective"], options: ["effect", "effectively", "effective"], correct: "effective", explanation: "An adjective is needed to describe the noun 'film'. 'Effective' means successful in producing a desired or intended result." },
+            { sentence: "My favorite teacher's greatest ... was her ability to connect with students.", blanks: ["strength"], options: ["strong", "strongly", "strength"], correct: "strength", explanation: "A noun is needed to complete the phrase 'greatest ...'. 'Strength' is the noun form of 'strong'." },
+            { sentence: "He acted with a great deal of ... in a difficult situation.", blanks: ["bravery"], options: ["brave", "bravely", "bravery"], correct: "bravery", explanation: "A noun is needed after 'a great deal of'. 'Bravery' is the noun form of 'brave'." },
+            { sentence: "The city has a strong ... to the arts.", blanks: ["commitment"], options: ["commit", "committed", "commitment"], correct: "commitment", explanation: "The noun 'commitment' is required after 'a strong'." },
+            { sentence: "The project's final ... was a huge success.", blanks: ["outcome"], options: ["out", "come", "outcome"], correct: "outcome", explanation: "A noun is needed to describe the result of the project. 'Outcome' is the correct noun." },
+            { sentence: "The new laws are a result of political ...", blanks: ["negotiation"], options: ["negotiate", "negotiator", "negotiation"], correct: "negotiation", explanation: "A noun is required to be the object of the preposition 'of'. 'Negotiation' is the noun form." },
+            { sentence: "I found his explanation very ...", blanks: ["convincing"], options: ["convince", "convinced", "convincing"], correct: "convincing", explanation: "An adjective is needed to describe the 'explanation'. 'Convincing' describes something that causes someone to believe." },
+            { sentence: "Her ... is her greatest asset.", blanks: ["kindness"], options: ["kind", "kindly", "kindness"], correct: "kindness", explanation: "The subject of the sentence is the noun 'kindness'." },
+            { sentence: "The government has made a strong ... to reduce pollution.", blanks: ["pledge"], options: ["pledge", "pledging", "pledged"], correct: "pledge", explanation: "A noun is required after 'a strong'. 'Pledge' is a noun meaning a formal promise." },
+            { sentence: "He is known for his ... of animals.", blanks: ["love"], options: ["love", "lovely", "loving"], correct: "love", explanation: "A noun is required after 'his'. 'Love' is the correct noun." },
+            { sentence: "The ... of the internet has transformed society.", blanks: ["creation"], options: ["create", "creative", "creation"], correct: "creation", explanation: "The subject of the sentence is the noun 'creation'." },
+            { sentence: "I remember my favorite movie was the one with the ... plot twist.", blanks: ["unexpected"], options: ["expect", "expectation", "unexpected"], correct: "unexpected", explanation: "An adjective is needed to describe the noun 'plot twist'. 'Unexpected' means not expected." },
+            { sentence: "The team's ... was excellent.", blanks: ["performance"], options: ["perform", "performer", "performance"], correct: "performance", explanation: "The subject of the sentence is the noun 'performance'." },
+            { sentence: "His ... behavior surprised everyone.", blanks: ["unpredictable"], options: ["predict", "prediction", "unpredictable"], correct: "unpredictable", explanation: "An adjective is needed to describe the noun 'behavior'. 'Unpredictable' means not able to be foreseen or foretold." },
+            { sentence: "The new policy will have a major ... on the economy.", blanks: ["impact"], options: ["impactful", "impacting", "impact"], correct: "impact", explanation: "A noun is required after 'a major'. 'Impact' is the correct noun." },
+            { sentence: "The city's ... has grown rapidly over the last decade.", blanks: ["population"], options: ["populate", "populous", "population"], correct: "population", explanation: "The subject of the sentence is the noun 'population'." },
+            { sentence: "My favorite teacher's greatest ... was his ability to inspire students.", blanks: ["strength"], options: ["strong", "strongly", "strength"], correct: "strength", explanation: "A noun is needed to complete the phrase 'greatest ...'. 'Strength' is the correct noun." },
+            { sentence: "He is a very ... person.", blanks: ["caring"], options: ["care", "carefully", "caring"], correct: "caring", explanation: "An adjective is needed to describe the noun 'person'. 'Caring' is the correct adjective form." },
+            { sentence: "The new software is very ... to use.", blanks: ["convenient"], options: ["convenience", "conveniently", "convenient"], correct: "convenient", explanation: "An adjective is needed after 'to be'. 'Convenient' is the correct adjective form." },
+            { sentence: "The lecture provided a detailed ... of the topic.", blanks: ["analysis"], options: ["analyze", "analytical", "analysis"], correct: "analysis", explanation: "A noun is required after 'a detailed'. 'Analysis' is the noun form of 'analyze'." },
+            { sentence: "The project's ... was quite challenging.", blanks: ["completion"], options: ["complete", "completely", "completion"], correct: "completion", explanation: "The subject of the sentence is the noun 'completion'." },
+            { sentence: "His ... of the situation was completely wrong.", blanks: ["assessment"], options: ["assess", "assessor", "assessment"], correct: "assessment", explanation: "A noun is required after 'His'. 'Assessment' is the noun form of 'assess'." },
+            { sentence: "The team worked ... to meet the deadline.", blanks: ["tirelessly"], options: ["tireless", "tirelessly", "tired"], correct: "tirelessly", explanation: "An adverb is needed to modify the verb 'worked'." },
+            { sentence: "The artist's work is known for its ...", blanks: ["creativity"], options: ["create", "creative", "creativity"], correct: "creativity", explanation: "The noun 'creativity' is required after 'for its'." },
+            { sentence: "He is a ... of great intelligence.", blanks: ["man"], options: ["manly", "manliness", "man"], correct: "man", explanation: "A noun is needed to refer to a person. 'Man' is the correct noun form." },
+            { sentence: "The weather is very ... today.", blanks: ["pleasant"], options: ["please", "pleasure", "pleasant"], correct: "pleasant", explanation: "An adjective is needed after 'very' to describe the 'weather'." },
+            { sentence: "I have a strong ... to get a high score in IELTS.", blanks: ["desire"], options: ["desire", "desirable", "desirably"], correct: "desire", explanation: "A noun is needed after 'a strong'. 'Desire' is the correct noun." },
+            { sentence: "His quick ... helped him solve the problem.", blanks: ["thinking"], options: ["think", "thoughtful", "thinking"], correct: "thinking", explanation: "A noun is needed after 'quick'. 'Thinking' is the noun form of 'think'." },
+            { sentence: "The film's ... was heavily influenced by real events.", blanks: ["production"], options: ["produce", "producer", "production"], correct: "production", explanation: "The subject of the sentence is the noun 'production'." },
+            { sentence: "I was filled with ... when I heard the good news.", blanks: ["happiness"], options: ["happy", "happily", "happiness"], correct: "happiness", explanation: "A noun is required after 'with'. 'Happiness' is the noun form of 'happy'." },
+            { sentence: "The company's rapid ... was due to its innovative products.", blanks: ["expansion"], options: ["expand", "expansive", "expansion"], correct: "expansion", explanation: "The subject of the sentence is the noun 'expansion'." },
+            { sentence: "The lecture provided great ... into the topic.", blanks: ["insight"], options: ["insightly", "insightful", "insight"], correct: "insight", explanation: "A noun is required after 'great'. 'Insight' is the correct noun form." },
+            { sentence: "The team's ... was evident in their final presentation.", blanks: ["collaboration"], options: ["collaborate", "collaborative", "collaboration"], correct: "collaboration", explanation: "The subject of the sentence is the noun 'collaboration'." }
+        ];
+
+        let currentExerciseIndex = 0;
+        let score = 0;
+        let hasChecked = false;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderExercise(currentExerciseIndex);
+            document.getElementById('check-button').addEventListener('click', checkAnswer);
+            document.getElementById('next-button').addEventListener('click', nextQuestion);
+        });
+
+        function renderExercise(index) {
+            const container = document.getElementById('exercise-container');
+            container.innerHTML = '';
+            hasChecked = false;
+            document.getElementById('feedback-message').textContent = "";
+            document.getElementById('check-button').style.display = 'block';
+            document.getElementById('next-button').style.display = 'block';
+
+            if (index >= exercises.length) {
+                showSummary();
+                return;
+            }
+
+            const exercise = exercises[index];
+            const exerciseHTML = `
+                <div class="bg-gray-50 rounded-2xl p-6 shadow-inner">
+                    <div class="text-lg md:text-xl font-bold text-gray-700 mb-4">Câu ${index + 1} / ${exercises.length}</div>
+                    <p id="sentence-${index}" class="text-gray-800 text-lg md:text-xl leading-relaxed">
+                        ${exercise.sentence.replace('...', `<span class="drop-zone border-2 border-dashed border-gray-400 rounded-lg p-2 md:p-3 inline-block w-40 h-10 md:h-12 align-middle mx-1" data-correct="${exercise.correct}"></span>`)}
+                    </p>
+                    <div id="options-${index}" class="flex flex-wrap gap-4 mt-6 justify-center md:justify-start">
+                        ${exercise.options.sort(() => Math.random() - 0.5).map(option => `
+                            <div class="draggable bg-indigo-500 text-white font-semibold py-2 px-6 rounded-full shadow-md hover:bg-indigo-600 transition-colors" draggable="true" data-word="${option}">
+                                ${option}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                <div id="explanation-${index}" class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mt-4 hidden rounded-lg">
+                    <p class="font-bold">Giải thích:</p>
+                    <p>${exercise.explanation}</p>
+                </div>
+            `;
+            container.innerHTML = exerciseHTML;
+
+            addEventListenersForDragAndDrop();
+        }
+
+        function addEventListenersForDragAndDrop() {
+            const draggables = document.querySelectorAll('.draggable');
+            const dropZones = document.querySelectorAll('.drop-zone');
+
+            draggables.forEach(draggable => {
+                draggable.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', e.target.dataset.word);
+                    e.target.classList.add('opacity-50');
+                });
+                draggable.addEventListener('dragend', (e) => {
+                    e.target.classList.remove('opacity-50');
+                });
+
+                // Add touch events for mobile
+                draggable.addEventListener('touchstart', (e) => {
+                    const touch = e.touches[0];
+                    draggable.dataset.touchX = touch.clientX;
+                    draggable.dataset.touchY = touch.clientY;
+                    draggable.classList.add('opacity-50');
+                });
+
+                draggable.addEventListener('touchmove', (e) => {
+                    e.preventDefault();
+                    const touch = e.touches[0];
+                    const diffX = touch.clientX - draggable.dataset.touchX;
+                    const diffY = touch.clientY - draggable.dataset.touchY;
+                    draggable.style.transform = `translate(${diffX}px, ${diffY}px)`;
+                });
+
+                draggable.addEventListener('touchend', (e) => {
+                    draggable.style.transform = 'translate(0, 0)';
+                    draggable.classList.remove('opacity-50');
+                    const touch = e.changedTouches[0];
+                    const dropZone = document.elementFromPoint(touch.clientX, touch.clientY).closest('.drop-zone');
+
+                    if (dropZone && dropZone.children.length === 0) {
+                        const word = draggable.dataset.word;
+                        const newElement = document.createElement('div');
+                        newElement.className = "text-center w-full h-full flex items-center justify-center text-gray-900 font-bold";
+                        newElement.textContent = word;
+                        newElement.dataset.word = word;
+                        dropZone.appendChild(newElement);
+                        draggable.style.display = 'none';
+                    }
+                });
+            });
+
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    zone.classList.add('drag-over');
+                });
+                zone.addEventListener('dragleave', () => {
+                    zone.classList.remove('drag-over');
+                });
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    const data = e.dataTransfer.getData('text/plain');
+                    const droppedWordElement = document.querySelector(`.draggable[data-word="${data}"]`);
+
+                    if (zone.children.length === 0) {
+                        const newElement = document.createElement('div');
+                        newElement.className = "text-center w-full h-full flex items-center justify-center text-gray-900 font-bold";
+                        newElement.textContent = data;
+                        newElement.dataset.word = data;
+                        zone.appendChild(newElement);
+                        droppedWordElement.style.display = 'none';
+                    }
+                    zone.classList.remove('drag-over');
+                });
+            });
+        }
+
+        function checkAnswer() {
+            const dropZone = document.querySelector('.drop-zone');
+            const droppedWordElement = dropZone.querySelector('div');
+            const feedbackMessage = document.getElementById('feedback-message');
+            const explanationDiv = document.getElementById(`explanation-${currentExerciseIndex}`);
+
+            if (hasChecked) {
+                feedbackMessage.textContent = "Bạn đã kiểm tra câu này. Vui lòng nhấn 'Câu Tiếp' để chuyển câu.";
+                feedbackMessage.className = "mt-4 text-xl font-semibold text-gray-600";
+                return;
+            }
+
+            if (!droppedWordElement) {
+                feedbackMessage.textContent = "Vui lòng kéo một từ vào ô trống!";
+                feedbackMessage.className = "mt-4 text-xl font-semibold text-red-600";
+                return;
+            }
+
+            const droppedWord = droppedWordElement.dataset.word;
+            const correctWord = dropZone.dataset.correct;
+
+            if (droppedWord === correctWord) {
+                score++;
+                dropZone.classList.add('correct');
+                dropZone.classList.remove('incorrect');
+                feedbackMessage.textContent = "Chính xác! 🎉";
+                feedbackMessage.className = "mt-4 text-xl font-semibold text-green-600";
+                explanationDiv.classList.remove('hidden');
+                hasChecked = true;
+            } else {
+                dropZone.classList.add('incorrect');
+                dropZone.classList.remove('correct');
+                feedbackMessage.textContent = "Chưa chính xác. Thử lại nhé! 🤔";
+                feedbackMessage.className = "mt-4 text-xl font-semibold text-red-600";
+                explanationDiv.classList.remove('hidden');
+                const optionsContainer = document.getElementById(`options-${currentExerciseIndex}`);
+                const draggableElements = optionsContainer.querySelectorAll('.draggable');
+                draggableElements.forEach(el => el.style.display = 'block');
+                dropZone.innerHTML = '';
+            }
+        }
+        
+        function nextQuestion() {
+            if (currentExerciseIndex < exercises.length - 1) {
+                currentExerciseIndex++;
+                renderExercise(currentExerciseIndex);
+            } else {
+                showSummary();
+            }
+        }
+
+        function showSummary() {
+            const container = document.getElementById('exercise-container');
+            container.innerHTML = `
+                <div class="text-center text-3xl md:text-4xl font-extrabold text-green-700">
+                    <p>Hoàn thành! 🎉</p>
+                    <p class="mt-4">Tổng kết kết quả của bạn:</p>
+                    <p class="mt-2 text-indigo-600">${score} / ${exercises.length}</p>
+                </div>
+            `;
+            document.getElementById('check-button').style.display = 'none';
+            document.getElementById('next-button').style.display = 'none';
+            document.getElementById('feedback-message').textContent = "";
+        }
+    </script>
+</body>
+</html>
